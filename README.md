@@ -1,4 +1,7 @@
 ### Changes:
+
+22-Feb-2021 21:02:00MST - Moved from OSS versions to "Basic" licensed ones. Also filtered out IDM "ping" entries.
+
 18-Dec-2020 11:02:00MST - Sync'ed the tail script with upstream (https://github.com/vscheuber/fidc-debug-tools), fixing the issue where the `pagedResultsCookie` was getting reset in case of an error response from the log API.
 
 
