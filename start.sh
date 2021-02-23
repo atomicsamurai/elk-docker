@@ -260,6 +260,11 @@ if [ -x /usr/local/bin/elk-post-hooks.sh ]; then
   . /usr/local/bin/elk-post-hooks.sh
 fi
 
+## replace FIDC API parameters using environment variables from "docker run"
+sed -i "s@##ORIGIN##@$ORIGIN@g" /opt/fidc/tail.js
+sed -i "s@##API_KEY_ID##@$API_KEY_ID@g" /opt/fidc/tail.js
+sed -i "s@##API_KEY_SECRET##@$API_KEY_SECRET@g" /opt/fidc/tail.js
+sed -i "s@##LOG_SOURCE##@$LOG_SOURCE@g" /opt/fidc/tail.js
 
 touch $OUTPUT_LOGFILES
 tail -f $OUTPUT_LOGFILES &

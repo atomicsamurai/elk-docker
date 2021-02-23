@@ -11,7 +11,7 @@
 ARG IMAGE=18.04-1.0.0
 
 FROM phusion/baseimage:${IMAGE}
-MAINTAINER Sebastien Pujadas http://pujadas.net
+MAINTAINER Sandeep Chaturvedi (forked from https://hub.docker.com/r/sebp/elk/)
 ENV \
  REFRESHED_AT=2020-06-20
 
@@ -23,9 +23,9 @@ ENV \
 ### install prerequisites (cURL, gosu, tzdata, JDK for Logstash)
 
 RUN set -x \
- && apt update -qq \
- && apt install -qqy --no-install-recommends ca-certificates curl gosu tzdata openjdk-11-jdk-headless \
- && apt clean \
+ && apt-get update -qq \
+ && apt-get install -qqy --no-install-recommends ca-certificates curl gosu tzdata openjdk-11-jdk-headless \
+ && apt-get clean \
  && rm -rf /var/lib/apt/lists/* \
  && gosu nobody true \
  && set +x
@@ -40,7 +40,6 @@ ARG ELK_BASE_VERSION=7.11.1
 
 # replace with aarch64 for ARM64 systems
 ARG ARCH=x86_64 
-
 
 ### install Elasticsearch
 
@@ -58,7 +57,7 @@ ENV \
 
 RUN DEBIAN_FRONTEND=noninteractive \
  && mkdir ${ES_HOME} \
- && curl -O https://artifacts.elastic.co/downloads/elasticsearch/${ES_PACKAGE} \
+ && curl --http1.1 -O https://artifacts.elastic.co/downloads/elasticsearch/${ES_PACKAGE} \
  && tar xzf ${ES_PACKAGE} -C ${ES_HOME} --strip-components=1 \
  && rm -f ${ES_PACKAGE} \
  && groupadd -r elasticsearch -g ${ES_GID} \
@@ -81,7 +80,7 @@ ENV \
  LOGSTASH_PATH_SETTINGS=${LOGSTASH_HOME}/config
 
 RUN mkdir ${LOGSTASH_HOME} \
- && curl -O https://artifacts.elastic.co/downloads/logstash/${LOGSTASH_PACKAGE} \
+ && curl --http1.1 -O https://artifacts.elastic.co/downloads/logstash/${LOGSTASH_PACKAGE} \
  && tar xzf ${LOGSTASH_PACKAGE} -C ${LOGSTASH_HOME} --strip-components=1 \
  && rm -f ${LOGSTASH_PACKAGE} \
  && groupadd -r logstash -g ${LOGSTASH_GID} \
@@ -102,7 +101,7 @@ ENV \
  KIBANA_UID=993
 
 RUN mkdir ${KIBANA_HOME} \
- && curl -O https://artifacts.elastic.co/downloads/kibana/${KIBANA_PACKAGE} \
+ && curl --http1.1 -O https://artifacts.elastic.co/downloads/kibana/${KIBANA_PACKAGE} \
  && tar xzf ${KIBANA_PACKAGE} -C ${KIBANA_HOME} --strip-components=1 \
  && rm -f ${KIBANA_PACKAGE} \
  && groupadd -r kibana -g ${KIBANA_GID} \
@@ -186,6 +185,8 @@ RUN chmod 644 /etc/logrotate.d/elasticsearch \
 
 ADD ./kibana.yml ${KIBANA_HOME}/config/kibana.yml
 
+### configure ForgeRock IDC
+ADD fidc/tail.js /opt/fidc/tail.js
 
 ###############################################################################
 #                                   START

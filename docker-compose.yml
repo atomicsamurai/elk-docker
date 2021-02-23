@@ -1,14 +1,20 @@
-# Docker Compose file for ELK stack
-
-# Build with:
-# docker-compose build elk
-
-# Run with:
-# docker-compose up
-
-elk:
-  build: .
-  ports:
-    - "5601:5601"
-    - "9200:9200"
-    - "5044:5044"
+version: '3.7'
+services:
+  minecraftserver:
+    image: sandeepc0/elk
+    container_name: elk-non-oss
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+    environment:
+      ES_HEAP_SIZE: "4G"
+      ORIGIN: "${ORIGIN}"
+      API_KEY_ID: "${API_KEY_ID}"
+      API_KEY_SECRET: "${API_KEY_SECRET}"
+      LOG_SOURCE: "${LOG_SOURCE}"
+      # LOGSTASH_START: "0"
+    ports:
+      - "5601:5601"
+      - "9200:9200"
+      - "5044:5044"
