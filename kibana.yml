@@ -99,3 +99,10 @@ server.host: "0.0.0.0"
 # Set the interval in milliseconds to sample system and process performance
 # metrics. Minimum is 100ms. Defaults to 5000.
 #ops.interval: 5000
+
+# xpack.fleet.enabled: true
+# xpack.fleet.agents.tlsCheckDisabled: true 
+# xpack.encryptedSavedObjects.encryptionKey: "something_at_least_32_characters"
+# xpack.security.enabled: true
+# elasticsearch.username: "elastic" 
+# elasticsearch.password: "DjSFx5lqCgBcH1BYYrKY"
