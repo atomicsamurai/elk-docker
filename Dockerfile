@@ -186,7 +186,8 @@ RUN chmod 644 /etc/logrotate.d/elasticsearch \
 ADD ./kibana.yml ${KIBANA_HOME}/config/kibana.yml
 
 ### configure ForgeRock IDC
-ADD fidc/tail.js /opt/fidc/tail.js
+ADD fidc/Workpad_FRSummary.ndjson /opt/fidc/Workpad_FRSummary.ndjson
+ADD fidc/fidc-init.sh /opt/fidc/fidc-init.sh
 
 ###############################################################################
 #                                   START
