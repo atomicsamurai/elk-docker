@@ -1,5 +1,6 @@
 ### Changes:
 
+- 16-Mar-2021 - Added ingest pipeline to extract GeoIP and User Agent data from (applicable) log entries
 - 15-Mar-2021 - Disabled logstash and automatic creation of index pattern and Canvas in Kibana
 - 02-Mar-2021 - Using filebeat to pull logs from ForgeRock ID Cloud
 - 22-Feb-2021 - Moved from OSS versions to "Basic" licensed ones. Also filtered out IDM "ping" entries.
@@ -65,7 +66,7 @@ $ docker-compose up -d
 
 8. You can now browse / query records.
 
-9. There is also a starter [Canvas](https://www.elastic.co/webinars/intro-to-canvas-a-new-way-to-tell-visual-stories-in-kibana) which show some popular / common statistics.
+9. There is also a starter [Canvas](https://www.elastic.co/webinars/intro-to-canvas-a-new-way-to-tell-visual-stories-in-kibana) which shows some popular / common statistics.
 
 This can be accessed at http://localhost:5601/app/canvas#/workpad/workpad-forgerock-summary
 
