@@ -13,7 +13,7 @@ This docker image contains the complete ELK stack. This is a fork of https://git
 
 1. First, export environment variables to point to a ID Cloud tenant. Best practice is to create separate `env` files specific to each environment. A template `.env.customername` file is attached:
 
-- [.env.customername](env.customername)
+- [.env.customername](https://github.com/sandman0/elk-docker/blob/master/env.customername)
 
 LOG_SOURCE can be a comma separated list of any of the following:
 ```
@@ -50,7 +50,7 @@ $ source .dev.env
 
 3. To run the ELK container, use the following file as docker-compose.yml on your machine.
 
-- [docker-compose.yml](docker-compose.yml)
+- [docker-compose.yml](https://github.com/sandman0/elk-docker/blob/master/docker-compose.yml)
 
 4. Then, to start the containers, from the directory where the above downloaded `docker-compose.yml` is, run the following to start the stack.
 ```
@@ -71,15 +71,15 @@ This can be accessed at http://localhost:5601/app/canvas#/workpad/workpad-forger
 
 A time period for restricting the data in Canvas can be selected at the top of page.
 
-![canvas](images/canvas1.png)
+![canvas](https://github.com/sandman0/elk-docker/raw/master/images/canvas1.png)
 
 The reason for using a Canvas vs a Dashboard is because the data (`transactionId`) in the Canvas is clickable.
 
-![clickable canvas](images/canvas2.png)
+![clickable canvas](https://github.com/sandman0/elk-docker/raw/master/images/canvas2.png)
 
 Clicking on a `transactionId` in one of the tables in the Canvas will take you to the Discover app filtered for that `transactionId`.
 
-![specific transactionId](images/discover.png)
+![specific transactionId](https://github.com/sandman0/elk-docker/raw/master/images/discover.png)
 
 ## Log event fields
 In the logs events, JSON formatted logs are available in `json_payload` map/object and the plain text logs are in `text_payload` object. This information can be used to further query data and create saved queries and visualizations etc in Kibana.
