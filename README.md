@@ -1,9 +1,9 @@
 ### Changes:
 
-15-Mar-2021 - Disabled logstash and automatic creation of index pattern and Canvas in Kibana
-02-Mar-2021 - Using filebeat to pull logs from ForgeRock ID Cloud
-22-Feb-2021 - Moved from OSS versions to "Basic" licensed ones. Also filtered out IDM "ping" entries.
-18-Dec-2020 - Sync'ed the tail script with upstream (https://github.com/vscheuber/fidc-debug-tools), fixing the issue where the `pagedResultsCookie` was getting reset in case of an error response from the log API.
+- 15-Mar-2021 - Disabled logstash and automatic creation of index pattern and Canvas in Kibana
+- 02-Mar-2021 - Using filebeat to pull logs from ForgeRock ID Cloud
+- 22-Feb-2021 - Moved from OSS versions to "Basic" licensed ones. Also filtered out IDM "ping" entries.
+- 18-Dec-2020 - Sync'ed the tail script with upstream (https://github.com/vscheuber/fidc-debug-tools), fixing the issue where the `pagedResultsCookie` was getting reset in case of an error response from the log API.
 
 
 # An ELK docker stack for ForgeRock Identity Cloud (FIDC)
