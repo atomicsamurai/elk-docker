@@ -67,7 +67,7 @@ $ docker-compose up -d
 
 9. There is also a starter [Canvas](https://www.elastic.co/webinars/intro-to-canvas-a-new-way-to-tell-visual-stories-in-kibana) which show some popular / common statistics.
 
-This can be accessed [HERE](http://localhost:5601/app/canvas#/workpad/workpad-forgerock-summary)
+This can be accessed at http://localhost:5601/app/canvas#/workpad/workpad-forgerock-summary
 
 A time period for restricting the data in Canvas can be selected at the top of page.
 
