@@ -24,7 +24,7 @@ ENV \
 
 RUN set -x \
  && apt-get update -qq \
- && apt-get install -qqy --no-install-recommends ca-certificates curl gosu tzdata openjdk-11-jdk-headless \
+ && apt-get install -qqy --no-install-recommends ca-certificates curl gosu tzdata openjdk-11-jdk-headless vim nmap net-tools \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/* \
  && gosu nobody true \
@@ -68,25 +68,25 @@ RUN DEBIAN_FRONTEND=noninteractive \
 
 ### install Logstash
 
-ENV \
- LOGSTASH_VERSION=${ELK_VERSION} \
- LOGSTASH_HOME=/opt/logstash
+# ENV \
+#  LOGSTASH_VERSION=${ELK_VERSION} \
+#  LOGSTASH_HOME=/opt/logstash
 
-ENV \
- LOGSTASH_PACKAGE=logstash-${LOGSTASH_VERSION}-linux-${ARCH}.tar.gz \
- LOGSTASH_GID=992 \
- LOGSTASH_UID=992 \
- LOGSTASH_PATH_CONF=/etc/logstash \
- LOGSTASH_PATH_SETTINGS=${LOGSTASH_HOME}/config
+# ENV \
+#  LOGSTASH_PACKAGE=logstash-${LOGSTASH_VERSION}-linux-${ARCH}.tar.gz \
+#  LOGSTASH_GID=992 \
+#  LOGSTASH_UID=992 \
+#  LOGSTASH_PATH_CONF=/etc/logstash \
+#  LOGSTASH_PATH_SETTINGS=${LOGSTASH_HOME}/config
 
-RUN mkdir ${LOGSTASH_HOME} \
- && curl --http1.1 -O https://artifacts.elastic.co/downloads/logstash/${LOGSTASH_PACKAGE} \
- && tar xzf ${LOGSTASH_PACKAGE} -C ${LOGSTASH_HOME} --strip-components=1 \
- && rm -f ${LOGSTASH_PACKAGE} \
- && groupadd -r logstash -g ${LOGSTASH_GID} \
- && useradd -r -s /usr/sbin/nologin -d ${LOGSTASH_HOME} -c "Logstash service user" -u ${LOGSTASH_UID} -g logstash logstash \
- && mkdir -p /var/log/logstash ${LOGSTASH_PATH_CONF}/conf.d \
- && chown -R logstash:logstash ${LOGSTASH_HOME} /var/log/logstash ${LOGSTASH_PATH_CONF}
+# RUN mkdir ${LOGSTASH_HOME} \
+#  && curl --http1.1 -O https://artifacts.elastic.co/downloads/logstash/${LOGSTASH_PACKAGE} \
+#  && tar xzf ${LOGSTASH_PACKAGE} -C ${LOGSTASH_HOME} --strip-components=1 \
+#  && rm -f ${LOGSTASH_PACKAGE} \
+#  && groupadd -r logstash -g ${LOGSTASH_GID} \
+#  && useradd -r -s /usr/sbin/nologin -d ${LOGSTASH_HOME} -c "Logstash service user" -u ${LOGSTASH_UID} -g logstash logstash \
+#  && mkdir -p /var/log/logstash ${LOGSTASH_PATH_CONF}/conf.d \
+#  && chown -R logstash:logstash ${LOGSTASH_HOME} /var/log/logstash ${LOGSTASH_PATH_CONF}
 
 
 ### install Kibana
@@ -123,9 +123,9 @@ RUN sed -i -e 's#^ES_HOME=$#ES_HOME='$ES_HOME'#' /etc/init.d/elasticsearch \
 
 ### Logstash
 
-ADD ./logstash-init /etc/init.d/logstash
-RUN sed -i -e 's#^LS_HOME=$#LS_HOME='$LOGSTASH_HOME'#' /etc/init.d/logstash \
- && chmod +x /etc/init.d/logstash
+# ADD ./logstash-init /etc/init.d/logstash
+# RUN sed -i -e 's#^LS_HOME=$#LS_HOME='$LOGSTASH_HOME'#' /etc/init.d/logstash \
+#  && chmod +x /etc/init.d/logstash
 
 
 ### Kibana
@@ -152,23 +152,23 @@ RUN cp ${ES_HOME}/config/log4j2.properties ${ES_HOME}/config/jvm.options \
 ### configure Logstash
 
 # certs/keys for Beats and Lumberjack input
-RUN mkdir -p /etc/pki/tls/{certs,private}
-ADD ./logstash-beats.crt /etc/pki/tls/certs/logstash-beats.crt
-ADD ./logstash-beats.key /etc/pki/tls/private/logstash-beats.key
+# RUN mkdir -p /etc/pki/tls/{certs,private}
+# ADD ./logstash-beats.crt /etc/pki/tls/certs/logstash-beats.crt
+# ADD ./logstash-beats.key /etc/pki/tls/private/logstash-beats.key
 
-# pipelines
-ADD pipelines.yml ${LOGSTASH_PATH_SETTINGS}/pipelines.yml
+# # pipelines
+# ADD pipelines.yml ${LOGSTASH_PATH_SETTINGS}/pipelines.yml
 
-# filters
-ADD ./logstash-conf/*.conf ${LOGSTASH_PATH_CONF}/conf.d/
+# # filters
+# ADD ./logstash-conf/*.conf ${LOGSTASH_PATH_CONF}/conf.d/
 
-# patterns
-ADD ./nginx.pattern ${LOGSTASH_HOME}/patterns/nginx
-RUN chown -R logstash:logstash ${LOGSTASH_HOME}/patterns
+# # patterns
+# ADD ./nginx.pattern ${LOGSTASH_HOME}/patterns/nginx
+# RUN chown -R logstash:logstash ${LOGSTASH_HOME}/patterns
 
-# Fix permissions
-RUN chmod -R +r ${LOGSTASH_PATH_CONF} ${LOGSTASH_PATH_SETTINGS} \
- && chown -R logstash:logstash ${LOGSTASH_PATH_SETTINGS}
+# # Fix permissions
+# RUN chmod -R +r ${LOGSTASH_PATH_CONF} ${LOGSTASH_PATH_SETTINGS} \
+#  && chown -R logstash:logstash ${LOGSTASH_PATH_SETTINGS}
 
 
 ### configure logrotate
