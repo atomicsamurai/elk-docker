@@ -1,15 +1,25 @@
 version: '3.7'
 services:
-  minecraftserver:
-    image: sandeepc0/elk
-    container_name: elk-non-oss
+  elk:
+    image: sandeepc0/elk-fidc
+    container_name: elk-forgerock-idcloud
     deploy:
       resources:
         limits:
           memory: 8G
     environment:
       ES_HEAP_SIZE: "4G"
+      LOGSTASH_START: "0"
     ports:
       - "5601:5601"
       - "9200:9200"
       - "5044:5044"
+  filebeat:
+    image: sandeepc0/filebeat-fidc
+    container_name: filebeat-forgerock-idcloud
+    environment:
+      TOGGLE_FOR_RESTART: "yes"
+      ORIGIN: "${ORIGIN}"
+      API_KEY_ID: "${API_KEY_ID}"
+      API_KEY_SECRET: "${API_KEY_SECRET}"
+      LOG_SOURCE: "${LOG_SOURCE}"
