@@ -81,6 +81,7 @@ Clicking on a `transactionId` in one of the tables in the Canvas will take you t
 
 ![specific transactionId](images/discover.png)
 
-Now you should see events in the interface.
+## Log event fields
+In the logs events, JSON formatted logs are available in `json_payload` map/object and the plain text logs are in `text_payload` object. This information can be used to further query data and create saved queries and visualizations etc in Kibana.
 
 ## TODO
