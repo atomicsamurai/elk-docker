@@ -13,9 +13,9 @@ curl "${KIBANA_URL}/api/saved_objects/index-pattern/filebeat-*" \
     -X POST \
     -H 'kbn-xsrf: true' \
     -H 'Content-Type: application/json' \
-    -d '{"attributes": {"title": "filebeat-*"}}'
+    -d '{"attributes":{"title":"filebeat-*","timeFieldName":"@timestamp"}}'
 echo "done"
-
+q
 echo -n "Creating ForgeRock Summary Canvas...."
 curl \
   -s \
