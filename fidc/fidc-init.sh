@@ -15,16 +15,6 @@ curl "${KIBANA_URL}/api/saved_objects/index-pattern/filebeat-*" \
     -H 'Content-Type: application/json' \
     -d '{"attributes":{"title":"filebeat-*","timeFieldName":"@timestamp"}}'
 echo "done"
-q
-echo -n "Creating ForgeRock Summary Canvas...."
-curl \
-  -s \
-  -X POST \
-  "${KIBANA_URL}/api/saved_objects/_import" \
-  -H "kbn-xsrf: true" \
-  --form file=@/opt/fidc/Workpad_FRSummary.ndjson
-
-echo "done"
 
 echo -n "Creating ingest pipelines...."
 curl \
@@ -50,4 +40,24 @@ curl \
   ]
 }
 '
+echo "done"
+
+echo -n "Creating ForgeRock Summary Canvas...."
+curl \
+  -s \
+  -X POST \
+  "${KIBANA_URL}/api/saved_objects/_import" \
+  -H "kbn-xsrf: true" \
+  --form file=@/opt/fidc/Workpad_FRSummary.ndjson
+
+echo "done"
+
+
+echo -n "Creating ForgeRock ID Cloud Dashboard...."
+curl \
+  -s \
+  -X POST \
+  "http://localhost:5601/api/saved_objects/_import" \
+  -H "kbn-xsrf: true" \
+  --form file=@/opt/fidc/Dashboards_Visuals_FR.ndjson
 echo "done"

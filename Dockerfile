@@ -187,6 +187,7 @@ ADD ./kibana.yml ${KIBANA_HOME}/config/kibana.yml
 
 ### configure ForgeRock IDC
 ADD fidc/Workpad_FRSummary.ndjson /opt/fidc/Workpad_FRSummary.ndjson
+ADD fidc/Dashboards_Visuals_FR.ndjson /opt/fidc/Dashboards_Visuals_FR.ndjson
 ADD fidc/fidc-init.sh /opt/fidc/fidc-init.sh
 
 ###############################################################################
