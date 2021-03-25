@@ -1,8 +1,8 @@
 
-const origin = '##ORIGIN##';
-const api_key_id = '##API_KEY_ID##';
-const api_key_secret = '##API_KEY_SECRET##';
-const source = '##LOG_SOURCE##';
+const origin = 'https://openam-forgerock-rcstest2.forgeblocks.com';
+const api_key_id = 'a34975028a50ff057beb560e2c315d26';
+const api_key_secret = '652cedfb873269e13627ea8b7ca0bcaf9c20d23a7fa84d2d0b407f245a2f08d3';
+const source = 'idm-sync';
 
 /* Specify the logs' source, as described in https://backstage.forgerock.com/docs/idcloud/latest/paas/tenant/audit-logs.html#getting_sources
 Currently available sources are listed below.
@@ -37,7 +37,7 @@ For development and debugging use "am-core" and "idm-core" respectively.
 const showLogs = undefined
 
 const misc_noise = [
-    'text/plain',
+    // 'text/plain',
     'http://null:8080/openidm/info/ping',
     'https://null:8080/openidm/info/ping',
     'com.iplanet.dpro.session.operations.ServerSessionOperationStrategy',
@@ -172,7 +172,7 @@ function tail({
                     // console.error('EXCLUDED: exclude='+exclude+' filter includes '+log.payload.logger+'='+filter.includes(log.payload.logger)+' filter includes '+log.type+'='+filter.includes(log.type))
                 } else {
                     // console.error('INCLUDED: exclude='+exclude+' filter includes '+log.payload.logger+'='+filter.includes(log.payload.logger)+' filter includes '+log.type+'='+filter.includes(log.type))
-                    console.log(JSON.stringify(log.payload))
+                    console.log("=====" + JSON.stringify(log.payload))
                 }
             })
             // if (excluded > 0) {
