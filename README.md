@@ -1,6 +1,7 @@
 ### Changelog:
 
 - 13-Apr-2021
+    - ** Important - changed environment variable names to make them specific to FIDC **
     - Added capability to pull logs from the past (not tailing)
     - Added configurable API request timeout (default 1m)
     - Added configurable interval between calls (does not apply to tail mode)
