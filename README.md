@@ -1,5 +1,6 @@
 ### Changelog:
 
+- 29-Apr-2021 - Added FIDC_LOG_END_TIME to only pull logs for a finite time window (does not work yes - details here: https://bugster.forgerock.org/jira/browse/FRAAS-6994)
 - 13-Apr-2021
     - ** Important - changed environment variable names to make them specific to FIDC **
     - Added capability to pull logs from the past (not tailing)
@@ -45,6 +46,7 @@ export FIDC_API_KEY_ID="67xxxxxxxxxxxxxxxxxxxxxxxxxxx221"
 export FIDC_API_KEY_SECRET="acxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxd6"
 export FIDC_LOG_SOURCE="idm-sync,am-access,am-authentication,idm-core,am-core"
 export FIDC_LOG_START_TIME="2021-03-10T00:00:00Z" # optional: only needed when pulling historical logs (not tailing)
+export FIDC_LOG_END_TIME="2021-03-10T12:00:00Z"   # optional: only needed when pulling historical logs (not tailing)
 export FIDC_PULL_INTERVAL="10s"                   # optional: default 10s (this is only used when FIDC_LOG_START_TIME is used)
 export FIDC_LOG_REQUEST_TIMEOUT="1m"              # optional: default 1m
 ```
@@ -54,7 +56,7 @@ Or, download [env-sample](https://raw.githubusercontent.com/sandman0/filebeat-do
 ---
 ** NOTE **
 
-If `FIDC_LOG_START_TIME` is set, filebeat will not "tail" the logs, instead it will start pulling logs from the specified instance in past. If you need to tail as well as pull historical logs, you can start a separate filebeat container without the `FIDC_LOG_START_TIME` variable set. How to do that is not covered in this doc.
+If `FIDC_LOG_START_TIME` is set, filebeat will not "tail" the logs, instead it will start pulling logs from the specified instance in past. You can also optionally specify `FIDC_LOG_END_TIME` (along with `FIDC_LOG_START_TIME`). If only `FIDC_LOG_START_TIME` is specified, it will pull all logs from that time to present time. If you need to tail as well as pull historical logs, you can start a separate filebeat container without the `FIDC_LOG_START_TIME` variable set. How to do that is not covered in this doc.
 
 ---
 
@@ -115,6 +117,7 @@ services:
       - FIDC_API_KEY_SECRET
       - FIDC_LOG_SOURCE
       - FIDC_LOG_START_TIME         # optional: only needed when pulling historical logs (not tailing)
+      - FIDC_LOG_END_TIME           # optional: only needed when pulling historical logs (not tailing)
       - FIDC_PULL_INTERVAL          # optional: default 10s (this is only used when FIDC_LOG_START_TIME is used)
       - FIDC_LOG_REQUEST_TIMEOUT    # optional: default 1m
 ```
