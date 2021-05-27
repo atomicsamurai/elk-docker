@@ -29,7 +29,7 @@ The ELK stack which stores, indexes and lets one query and visualize log data
 Something that can make REST API calls to ID Cloud and can be configured to connect to different ID Cloud tenants or different ELK stack. filebeat is used for this.
 Here is what the architecture looks like:
 
-![fidc_elk_arch.png](https://github.com/sandman0/elk-docker/raw/master/images/fidc_elk_arch.png)
+![fidc_elk_arch.png](https://github.com/atomicsamurai/elk-docker/raw/master/images/fidc_elk_arch.png)
 
 
 ## To Use
@@ -51,7 +51,7 @@ export FIDC_PULL_INTERVAL="10s"                   # optional: default 10s (this 
 export FIDC_LOG_REQUEST_TIMEOUT="1m"              # optional: default 1m
 ```
 
-Or, download [env-sample](https://raw.githubusercontent.com/sandman0/filebeat-docker/main/env-sample)
+Or, download [env-sample](https://raw.githubusercontent.com/atomicsamurai/filebeat-docker/main/env-sample)
 
 ---
 ** NOTE **
@@ -122,7 +122,7 @@ services:
       - FIDC_LOG_REQUEST_TIMEOUT    # optional: default 1m
 ```
 
-Or, download [docker-compose.yml](https://raw.githubusercontent.com/sandman0/filebeat-docker/main/docker-compose.yml)
+Or, download [docker-compose.yml](https://raw.githubusercontent.com/atomicsamurai/filebeat-docker/main/docker-compose.yml)
 
 4. Then, to start the containers, from the directory where the above downloaded `docker-compose.yml` is, run the following to start the stack.
 ```
@@ -144,15 +144,15 @@ This can be accessed at http://localhost:5601/app/canvas#/workpad/workpad-forger
 
 A time period for restricting the data in Canvas can be selected at the top of page.
 
-![canvas](https://github.com/sandman0/elk-docker/raw/master/images/canvas1.png)
+![canvas](https://github.com/atomicsamurai/elk-docker/raw/master/images/canvas1.png)
 
 The reason for using a Canvas vs a Dashboard is because the data (`transactionId`) in the Canvas is clickable.
 
-![clickable canvas](https://github.com/sandman0/elk-docker/raw/master/images/canvas2.png)
+![clickable canvas](https://github.com/atomicsamurai/elk-docker/raw/master/images/canvas2.png)
 
 Clicking on a `transactionId` in one of the tables in the Canvas will take you to the Discover app filtered for that `transactionId`.
 
-![specific transactionId](https://github.com/sandman0/elk-docker/raw/master/images/discover.png)
+![specific transactionId](https://github.com/atomicsamurai/elk-docker/raw/master/images/discover.png)
 
 ## Log event fields
 In the logs events, JSON formatted logs are available in two fields:
@@ -182,7 +182,7 @@ Filebeat has an `httpjson` input which is used here instead of tail.js. The `ht
 
 ### Docker images on docker hub
 
-- ELK image: https://hub.docker.com/repository/docker/sandeepc0/elk-fidc (https://github.com/sandman0/elk-docker)
-- Filebeat image: https://hub.docker.com/repository/docker/sandeepc0/filebeat-fidc (https://github.com/sandman0/filebeat-docker)
+- ELK image: https://hub.docker.com/repository/docker/sandeepc0/elk-fidc (https://github.com/atomicsamurai/elk-docker)
+- Filebeat image: https://hub.docker.com/repository/docker/sandeepc0/filebeat-fidc (https://github.com/atomicsamurai/filebeat-docker)
 
 ## TODO
