@@ -56,7 +56,10 @@ Or, download [env-sample](https://raw.githubusercontent.com/atomicsamurai/filebe
 ---
 ** NOTE **
 
-If `FIDC_LOG_START_TIME` is set, filebeat will not "tail" the logs, instead it will start pulling logs from the specified instance in past. You can also optionally specify `FIDC_LOG_END_TIME` (along with `FIDC_LOG_START_TIME`). If only `FIDC_LOG_START_TIME` is specified, it will pull all logs from that time to present time. If you need to tail as well as pull historical logs, you can start a separate filebeat container without the `FIDC_LOG_START_TIME` variable set. How to do that is not covered in this doc.
+If `FIDC_LOG_START_TIME` is set, filebeat will not "tail" the logs, instead it will start pulling logs from the specified instance in past. You should also  specify `FIDC_LOG_END_TIME`. If only `FIDC_LOG_START_TIME` is specified, you will get quota errors from ID Cloud. See quota rejection screenshot below.
+![fidc_elk_quota.png](https://github.com/atomicsamurai/elk-docker/raw/master/images/fidc_elk_quota.png)
+
+If you need to tail as well as pull historical logs, you can start a separate filebeat container without the `FIDC_LOG_START_TIME` variable set. How to do that is not covered in this doc.
 
 ---
 
