@@ -1,5 +1,6 @@
 ### Changelog:
 
+- 1-Jun-2023 - Updated Elastic stack to v8.7.1
 - 26-Jan-2022 - Updated Elastic stack to v7.16.3, for fixing log4j related vulnerability (https://www.elastic.co/blog/log4j2-vulnerability-what-to-know-security-vulnerability-learn-more-elastic-support.)
 - 29-Apr-2021 - Added FIDC_LOG_END_TIME to only pull logs for a finite time window (does not work yes - details here: https://bugster.forgerock.org/jira/browse/FRAAS-6994)
 - 13-Apr-2021

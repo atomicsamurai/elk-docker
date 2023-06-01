@@ -2,8 +2,6 @@
 #
 # /usr/local/bin/start.sh
 # Start Elasticsearch, Logstash and Kibana services
-#
-# spujadas 2015-10-09; added initial pidfile removal and graceful termination
 
 # WARNING - This script assumes that the ELK services are not running, and is
 #   only expected to be run once, when the container is started.
@@ -15,9 +13,18 @@
 
 _term() {
   echo "Terminating ELK"
-  service elasticsearch stop
-#   service logstash stop
-  service kibana stop
+
+  # shut down services
+  timeout 60 service elasticsearch stop &
+  timeout 60 service logstash stop &
+  timeout 60 service kibana stop &
+  trap - SIGTERM SIGINT
+
+  # wait for all services to stop
+  wait
+
+  # kill script PGID so all the child processes are killed, to avoid zombies
+  kill -TERM -- -$$ 2>/dev/null
   exit 0
 }
 
@@ -66,17 +73,17 @@ else
   # update permissions of ES data directory
   chown -R elasticsearch:elasticsearch /var/lib/elasticsearch
 
-  # override ES_HEAP_SIZE variable if set
+  # override JVM heap size using custom JVM options file if ES_HEAP_SIZE variable is set
   if [ ! -z "$ES_HEAP_SIZE" ]; then
-    awk -v LINE="-Xmx$ES_HEAP_SIZE" '{ sub(/^.Xmx.*/, LINE); print; }' ${ES_PATH_CONF}/jvm.options \
-        > ${ES_PATH_CONF}/jvm.options.new && mv ${ES_PATH_CONF}/jvm.options.new ${ES_PATH_CONF}/jvm.options
-    awk -v LINE="-Xms$ES_HEAP_SIZE" '{ sub(/^.Xms.*/, LINE); print; }' ${ES_PATH_CONF}/jvm.options \
-        > ${ES_PATH_CONF}/jvm.options.new && mv ${ES_PATH_CONF}/jvm.options.new ${ES_PATH_CONF}/jvm.options
+    cat << EOF > ${ES_PATH_CONF}/jvm.options.d/heap_size.options
+-Xmx$ES_HEAP_SIZE
+-Xms$ES_HEAP_SIZE
+EOF
   fi
 
+  # disable JVM HeapDumpOnOutOfMemoryError if ES_HEAP_DISABLE variable is set
   if [ ! -z "$ES_HEAP_DISABLE" ]; then
-    awk -v LINE="#-XX:+HeapDumpOnOutOfMemoryError" '{ sub(/^-XX:\+HeapDumpOnOutOfMemoryError.*/, LINE); print; }' ${ES_PATH_CONF}/jvm.options \
-        > ${ES_PATH_CONF}/jvm.options.new && mv ${ES_PATH_CONF}/jvm.options.new ${ES_PATH_CONF}/jvm.options
+    echo "-XX:-HeapDumpOnOutOfMemoryError" > ${ES_PATH_CONF}/jvm.options.d/heap_dump.options
   fi
 
   # override ES_JAVA_OPTS variable if set
@@ -158,34 +165,34 @@ fi
 
 ### Logstash
 
-# if [ -z "$LOGSTASH_START" ]; then
-#   LOGSTASH_START=1
-# fi
-# if [ "$LOGSTASH_START" -ne "1" ]; then
-#   echo "LOGSTASH_START is set to something different from 1, not starting..."
-# else
-#   # override LS_HEAP_SIZE variable if set
-#   if [ ! -z "$LS_HEAP_SIZE" ]; then
-#     awk -v LINE="-Xmx$LS_HEAP_SIZE" '{ sub(/^.Xmx.*/, LINE); print; }' ${LOGSTASH_PATH_SETTINGS}/jvm.options \
-#         > ${LOGSTASH_PATH_SETTINGS}/jvm.options.new && mv ${LOGSTASH_PATH_SETTINGS}/jvm.options.new ${LOGSTASH_PATH_SETTINGS}/jvm.options
-#     awk -v LINE="-Xms$LS_HEAP_SIZE" '{ sub(/^.Xms.*/, LINE); print; }' ${LOGSTASH_PATH_SETTINGS}/jvm.options \
-#         > ${LOGSTASH_PATH_SETTINGS}/jvm.options.new && mv ${LOGSTASH_PATH_SETTINGS}/jvm.options.new ${LOGSTASH_PATH_SETTINGS}/jvm.options
-#   fi
+if [ -z "$LOGSTASH_START" ]; then
+  LOGSTASH_START=1
+fi
+if [ "$LOGSTASH_START" -ne "1" ]; then
+  echo "LOGSTASH_START is set to something different from 1, not starting..."
+else
+  # override LS_HEAP_SIZE variable if set
+  if [ ! -z "$LS_HEAP_SIZE" ]; then
+    awk -v LINE="-Xmx$LS_HEAP_SIZE" '{ sub(/^.Xmx.*/, LINE); print; }' ${LOGSTASH_PATH_SETTINGS}/jvm.options \
+        > ${LOGSTASH_PATH_SETTINGS}/jvm.options.new && mv ${LOGSTASH_PATH_SETTINGS}/jvm.options.new ${LOGSTASH_PATH_SETTINGS}/jvm.options
+    awk -v LINE="-Xms$LS_HEAP_SIZE" '{ sub(/^.Xms.*/, LINE); print; }' ${LOGSTASH_PATH_SETTINGS}/jvm.options \
+        > ${LOGSTASH_PATH_SETTINGS}/jvm.options.new && mv ${LOGSTASH_PATH_SETTINGS}/jvm.options.new ${LOGSTASH_PATH_SETTINGS}/jvm.options
+  fi
 
-#   if [ ! -z "$LS_HEAP_DISABLE" ]; then
-#     awk -v LINE="#-XX:+HeapDumpOnOutOfMemoryError" '{ sub(/^-XX:\+HeapDumpOnOutOfMemoryError.*/, LINE); print; }' ${LOGSTASH_PATH_SETTINGS}/jvm.options \
-#         > ${LOGSTASH_PATH_SETTINGS}/jvm.options.new && mv ${LOGSTASH_PATH_SETTINGS}/jvm.options.new ${LOGSTASH_PATH_SETTINGS}/jvm.options
-#   fi
+  if [ ! -z "$LS_HEAP_DISABLE" ]; then
+    awk -v LINE="#-XX:+HeapDumpOnOutOfMemoryError" '{ sub(/^-XX:\+HeapDumpOnOutOfMemoryError.*/, LINE); print; }' ${LOGSTASH_PATH_SETTINGS}/jvm.options \
+        > ${LOGSTASH_PATH_SETTINGS}/jvm.options.new && mv ${LOGSTASH_PATH_SETTINGS}/jvm.options.new ${LOGSTASH_PATH_SETTINGS}/jvm.options
+  fi
 
-#   # override LS_OPTS variable if set
-#   if [ ! -z "$LS_OPTS" ]; then
-#     awk -v LINE="LS_OPTS=\"$LS_OPTS\"" '{ sub(/^LS_OPTS=.*/, LINE); print; }' /etc/init.d/logstash \
-#         > /etc/init.d/logstash.new && mv /etc/init.d/logstash.new /etc/init.d/logstash && chmod +x /etc/init.d/logstash
-#   fi
+  # override LS_OPTS variable if set
+  if [ ! -z "$LS_OPTS" ]; then
+    awk -v LINE="LS_OPTS=\"$LS_OPTS\"" '{ sub(/^LS_OPTS=.*/, LINE); print; }' /etc/init.d/logstash \
+        > /etc/init.d/logstash.new && mv /etc/init.d/logstash.new /etc/init.d/logstash && chmod +x /etc/init.d/logstash
+  fi
 
-#   service logstash start
-#   OUTPUT_LOGFILES+="/var/log/logstash/logstash-plain.log "
-# fi
+  service logstash start
+  OUTPUT_LOGFILES+="/var/log/logstash/logstash-plain.log "
+fi
 
 
 ### Kibana
@@ -257,14 +264,12 @@ if [ -x /usr/local/bin/elk-post-hooks.sh ] || [ -x /opt/fidc/fidc-init.sh ]; the
     fi
   fi
 
-  if [ -x /usr/local/bin/elk-post-hooks.sh ]; then
-    . /usr/local/bin/elk-post-hooks.sh
-  fi
+  . /usr/local/bin/elk-post-hooks.sh
 
-  # ForgeRock IDC - Kibana started, create FIDC config
+    # ForgeRock IDC - Kibana started, create FIDC config
   /opt/fidc/fidc-init.sh
-
 fi
+
 
 touch $OUTPUT_LOGFILES
 tail -f $OUTPUT_LOGFILES &
