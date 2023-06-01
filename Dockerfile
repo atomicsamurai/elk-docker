@@ -24,7 +24,7 @@ ENV \
 
 RUN set -x \
  && apt update -qq \
- && apt install -qqy --no-install-recommends ca-certificates curl gosu tzdata openjdk-11-jdk-headless \
+ && apt install -qqy --no-install-recommends ca-certificates curl gosu tzdata openjdk-11-jdk-headless vim nmap net-tools \
  && apt clean \
  && rm -rf /var/lib/apt/lists/* \
  && gosu nobody true \
