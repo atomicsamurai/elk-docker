@@ -112,10 +112,10 @@ EOF
   # or attempting to stream its log file
   # - https://github.com/elasticsearch/kibana/issues/3077
 
-  # set number of retries (default: 30, override using ES_CONNECT_RETRY env var)
+  # set number of retries (default: 60, override using ES_CONNECT_RETRY env var)
   re_is_numeric='^[0-9]+$'
   if ! [[ $ES_CONNECT_RETRY =~ $re_is_numeric ]] ; then
-     ES_CONNECT_RETRY=30
+     ES_CONNECT_RETRY=60
   fi
 
   if [ -z "$ELASTICSEARCH_URL" ]; then
@@ -137,11 +137,11 @@ EOF
 
   # wait for cluster to respond before getting its name
   counter=0
-  while [ -z "$CLUSTER_NAME" -a $counter -lt 30 ]; do
+  while [ -z "$CLUSTER_NAME" -a $counter -lt 60 ]; do
     sleep 1
     ((counter++))
     CLUSTER_NAME=$(curl -k ${ELASTICSEARCH_URL}/_cat/health?h=cluster 2> /dev/null | tr -d '[:space:]')
-    echo "Waiting for Elasticsearch cluster to respond ($counter/30)"
+    echo "Waiting for Elasticsearch cluster to respond ($counter/60)"
   done
 
   if [ -z "$CLUSTER_NAME" ]; then
@@ -228,9 +228,9 @@ if [ -x /usr/local/bin/elk-post-hooks.sh ] || [ -x /opt/fidc/fidc-init.sh ]; the
 
   ### ... then wait for Kibana to be up first to ensure that .kibana index is
   ### created before the post-hooks are executed
-    # set number of retries (default: 30, override using KIBANA_CONNECT_RETRY env var)
+    # set number of retries (default: 60, override using KIBANA_CONNECT_RETRY env var)
     if ! [[ $KIBANA_CONNECT_RETRY =~ $re_is_numeric ]] ; then
-       KIBANA_CONNECT_RETRY=30
+       KIBANA_CONNECT_RETRY=60
     fi
 
     if [ -z "$KIBANA_URL" ]; then
@@ -251,10 +251,10 @@ if [ -x /usr/local/bin/elk-post-hooks.sh ] || [ -x /opt/fidc/fidc-init.sh ]; the
     fi
     # wait for Kibana to not only be up but to return 200 OK
     counter=0
-    while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' ${KIBANA_URL}/api/status)" != "200" && $counter -lt 30 ]]; do
+    while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' ${KIBANA_URL}/api/status)" != "200" && $counter -lt 60 ]]; do
       sleep 1
       ((counter++))
-      echo "waiting for Kibana to respond ($counter/30)"
+      echo "waiting for Kibana to respond ($counter/60)"
     done
     if [[ "$(curl -s -o /dev/null -w ''%{http_code}'' ${KIBANA_URL}/api/status)" != "200" ]]; then
       echo "Timed out waiting for Kibana to respond. Exiting."

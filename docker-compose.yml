@@ -9,6 +9,7 @@ services:
           memory: 8G
     environment:
       LOGSTASH_START: "0"
+      ES_CONNECT_RETRY: "60"
     ports:
       - "5601:5601"
       - "9200:9200"
