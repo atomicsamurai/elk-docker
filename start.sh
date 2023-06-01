@@ -264,7 +264,9 @@ if [ -x /usr/local/bin/elk-post-hooks.sh ] || [ -x /opt/fidc/fidc-init.sh ]; the
     fi
   fi
 
-  . /usr/local/bin/elk-post-hooks.sh
+  if [ -x /usr/local/bin/elk-post-hooks.sh ]; then
+    . /usr/local/bin/elk-post-hooks.sh
+  fi
 
     # ForgeRock IDC - Kibana started, create FIDC config
   /opt/fidc/fidc-init.sh
