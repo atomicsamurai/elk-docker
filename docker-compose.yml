@@ -1,22 +1,22 @@
-version: '3.7'
+version: '3.8'
 services:
   elk:
     image: sandeepc0/elk-fidc
-    container_name: elk-forgerock-idcloud
+    container_name: elk
     deploy:
       resources:
         limits:
           memory: 8G
     environment:
-      ES_HEAP_SIZE: "4G"
       LOGSTASH_START: "0"
+      ES_CONNECT_RETRY: "60"
     ports:
       - "5601:5601"
       - "9200:9200"
       - "5044:5044"
   filebeat:
     image: sandeepc0/filebeat-fidc
-    container_name: filebeat-forgerock-idcloud
+    container_name: filebeat
     environment:
       TOGGLE_FOR_RESTART: "yes"
       ORIGIN: "${ORIGIN}"

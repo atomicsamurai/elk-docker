@@ -37,15 +37,17 @@ This web page documents how to use the [sebp/elk](https://hub.docker.com/r/sebp/
  	- [Elasticsearch is not starting (1): `max virtual memory areas vm.max_map_count [65530] likely too low, increase to at least [262144]`](#es-not-starting-max-map-count)
 	- [Elasticsearch is not starting (2): `cat: /var/log/elasticsearch/elasticsearch.log: No such file or directory`](#es-not-starting-not-enough-memory)
 	- [Elasticsearch is not starting (3): bootstrap tests](#es-not-starting-bootstrap-tests)
+	- [Elasticsearch is not starting (4): no errors in log](#es-not-starting-timeout)
 	- [Elasticsearch is suddenly stopping after having started properly](#es-suddenly-stopping)
 	- [Miscellaneous](#issues-misc)
-- [Known issues](#known-issues)
+- [Assorted hints](#assorted-hints)
 - [Troubleshooting](#troubleshooting)
 	- [If Elasticsearch isn't starting...](#es-not-starting)
 	- [If your log-emitting client doesn't seem to be able to reach Logstash...](#logstash-unreachable)
 	- [Additional tips](#general-troubleshooting)
 - [Reporting issues](#reporting-issues)
 - [Breaking changes](#breaking-changes)
+- [Release notes](#release-notes)
 - [References](#references)
 - [About](#about)
 
@@ -58,13 +60,14 @@ To run a container using this image, you will need the following:
 	Install [Docker](https://docker.com/), either using a native package (Linux) or wrapped in a virtual machine (Windows, OS X – e.g. using [Boot2Docker](http://boot2docker.io/) or [Vagrant](https://www.vagrantup.com/)).
 
 	**Note** – As the *sebp/elk* image is based on a Linux image, users of Docker for Windows will need to ensure that [Docker is using Linux containers](https://docs.docker.com/docker-for-windows/#switch-between-windows-and-linux-containers).
-	 
-
+	
 - **A minimum of 4GB RAM assigned to Docker**
 
 	Elasticsearch alone needs at least 2GB of RAM to run.
 
 	With Docker for Mac, the amount of RAM dedicated to Docker can be set using the UI: see [How to increase docker-machine memory Mac](http://stackoverflow.com/questions/32834082/how-to-increase-docker-machine-memory-mac/39720010#39720010) (Stack Overflow).
+
+	In Docker Desktop for Windows, [use the *Advanced* tab to adjust limits on resources available to Docker](https://docs.docker.com/docker-for-windows/#:~:text=Memory%3A%20By%20default%2C%20Docker%20Desktop,swap%20file%20size%20as%20needed).
 
 - **A limit on mmap counts equal to 262,144 or more**
 
@@ -207,7 +210,7 @@ By default, when starting a container, all three of the ELK services (Elasticsea
 The following environment variables may be used to selectively start a subset of the services:
 
 - `ELASTICSEARCH_START`: if set and set to anything other than `1`, then Elasticsearch will not be started.
- 
+
 - `LOGSTASH_START`: if set and set to anything other than `1`, then Logstash will not be started.
 
 - `KIBANA_START`: if set and set to anything other than `1`, then Kibana will not be started.
@@ -238,7 +241,7 @@ The following environment variables can be used to override the defaults used to
 	Specifying a heap size – e.g. `2g` – will set both the min and max to the provided value. To set the min and max values separately, see the `ES_JAVA_OPTS` below. 
 
 - `ES_JAVA_OPTS`: additional Java options for Elasticsearch (default: `""`)
- 
+
 	For instance, to set the min and max heap size to 512MB and 2G, set this environment variable to `-Xms512m -Xmx2g`.
 
 - `ES_CONNECT_RETRY`: number of seconds to wait for Elasticsearch to be up before starting Logstash and/or Kibana (default: `30`) 
@@ -320,7 +323,7 @@ Here is a sample `/etc/filebeat/filebeat.yml` configuration file for Filebeat, t
 	    timeout: 15
 	    ssl:
 	      certificate_authorities:
-      	      - /etc/pki/tls/certs/logstash-beats.crt
+	  	      - /etc/pki/tls/certs/logstash-beats.crt
 	
 	filebeat:
 	  inputs:
@@ -399,7 +402,7 @@ With Compose here's what example entries for a (locally built log-generating) co
 	    - "80:80"
 	  links:
 	    - elk
-
+	
 	elk:
 	  image: sebp/elk
 	  ports:
@@ -472,10 +475,10 @@ Elasticsearch runs as the user `elasticsearch`. To avoid issues with permissions
 A `Dockerfile` like the following will extend the base image and install the [GeoIP processor plugin](https://www.elastic.co/guide/en/elasticsearch/plugins/master/ingest-geoip.html) (which adds information about the geographical location of IP addresses):
 
 	FROM sebp/elk
-
+	
 	ENV ES_HOME /opt/elasticsearch
 	WORKDIR ${ES_HOME}
-
+	
 	RUN yes | CONF_DIR=/etc/elasticsearch gosu elasticsearch bin/elasticsearch-plugin \
 		install -b ingest-geoip
 
@@ -490,7 +493,7 @@ Logstash runs as the user `logstash`. To avoid issues with permissions, it is th
 The following `Dockerfile` can be used to extend the base image and install the [RSS input plugin](https://www.elastic.co/guide/en/logstash/current/plugins-inputs-rss.html):
 
 	FROM sebp/elk
-
+	
 	WORKDIR ${LOGSTASH_HOME}
 	RUN gosu logstash bin/logstash-plugin install logstash-input-rss
 
@@ -645,17 +648,15 @@ An even more optimal way to distribute Elasticsearch, Logstash and Kibana across
 
 As it stands this image is meant for local test use, and as such hasn't been secured: access to the ELK services is unrestricted, and default authentication server certificates and private keys for the Logstash input plugins are bundled with the image.
 
+**Note** – In fact, since version 8 of the image, security has been explicitly disabled, see the [Release notes](#release-notes) section.
+
 To harden this image, at the very least you would want to:
 
-- Restrict the access to the ELK services to authorised hosts/networks only, as described in e.g. [Elasticsearch Scripting and Security](https://www.elastic.co/blog/scripting-security/) and [Elastic Security: Deploying Logstash, ElasticSearch, Kibana "securely" on the Internet](http://blog.eslimasec.com/2014/05/elastic-security-deploying-logstash.html).
-- Password-protect the access to Kibana and Elasticsearch (see [SSL And Password Protection for Kibana](http://technosophos.com/2014/03/19/ssl-password-protection-for-kibana.html)).
+- Configure the services to run with security enabled, see [Start the Elastic Stack with security enabled](https://www.elastic.co/guide/en/elasticsearch/reference/8.0/configuring-stack-security.html) (Elasticsearch),  [Secure your connection to Elasticsearch](https://www.elastic.co/guide/en/logstash/8.0/ls-security.html) (Logstash), and [Configure security in Kibana](https://www.elastic.co/guide/en/kibana/8.0/using-kibana-with-security.html) (Kibana) for version 8 of the ELK services.
+
 - Generate a new self-signed authentication certificate for the Logstash input plugins (see [Notes on certificates](#certificates)) or (better) get a proper certificate from a commercial provider (known as a certificate authority), and keep the private key private.
 
-X-Pack, which is now bundled with the other ELK services, may be a useful to implement enterprise-grade security to the ELK stack.
-
-Alternatively, to implement authentication in a simple way, a reverse proxy (e.g. as provided by [nginx](https://www.nginx.com/) or [Caddy](https://caddyserver.com/)) could be used in front of the ELK services. 
-
-If on the other hand you want to disable certificate-based server authentication (e.g. in a demo environment), see [Disabling SSL/TLS](#disabling-ssl-tls).
+  If on the other hand you want to disable certificate-based server authentication (e.g. in a demo environment), see [Disabling SSL/TLS](#disabling-ssl-tls).
 
 ### Notes on certificates <a name="certificates"></a>
 
@@ -728,6 +729,12 @@ In particular, in case (1) above, the message `max virtual memory areas vm.max_m
 
 Another example is `max file descriptors [4096] for elasticsearch process is too low, increase to at least [65536]`. In this case, the host's limits on open files (as displayed by `ulimit -n`) must be increased (see [File Descriptors](https://www.elastic.co/guide/en/elasticsearch/reference/current/file-descriptors.html) in Elasticsearch documentation); and Docker's `ulimit` settings must be adjusted, either for the container (using [`docker run`'s `--ulimit` option](https://docs.docker.com/engine/reference/commandline/run/#set-ulimits-in-container---ulimit) or [Docker Compose's `ulimits` configuration option](https://docs.docker.com/compose/compose-file/#ulimits)) or globally (e.g. in `/etc/sysconfig/docker`, add `OPTIONS="--default-ulimit nofile=1024:65536"`). 
 
+### Elasticsearch is not starting (4): no errors in log <a name="es-not-starting-timeout"></a>
+
+If Elasticsearch’s logs are dumped with no apparent error, then it may not have had enough time to start within the default window of 30 seconds.
+
+In that case, you should set the `ES_CONNECT_RETRY` environment variable (see [Overriding start-up variables](#overriding-variables)) to a larger value to give Elasticsearch enough time to start running.
+
 ### Elasticsearch is suddenly stopping after having started properly <a name="es-suddenly-stopping"></a>
 
 With the default image, this is usually due to Elasticsearch running out of memory after the other services are started, and the corresponding process being (silently) killed.
@@ -743,37 +750,9 @@ Other known issues include:
 - Incorrect proxy settings, e.g. if a proxy is defined for Docker, ensure that connections to `localhost` are not proxied (e.g. by using a `no_proxy` setting).
 
 
-## Known issues <a name="known-issues"></a>
+## Assorted hints <a name="assorted-hints"></a>
 
-When using Filebeat, an [index template file](https://www.elastic.co/guide/en/beats/filebeat/6.0/filebeat-template.html) is used to connect to Elasticsearch to define settings and mappings that determine how fields should be analysed.
-
-In version 5, before starting Filebeat for the first time, you would run this command (replacing `elk` with the appropriate hostname) to load the default index template in Elasticsearch:
-
-		curl -XPUT 'http://elk:9200/_template/filebeat?pretty' -d@/etc/filebeat/filebeat.template.json
-
-In version 6 however, the `filebeat.template.json` template file has been replaced with a `fields.yml` file, which is used to load the index manually by running `filebeat setup --template` [as per the official Filebeat instructions](https://www.elastic.co/guide/en/beats/filebeat/6.0/filebeat-template.html#load-template-manually). Unfortunately, this doesn't currently work and results in the following message:
-
-    Exiting: Template loading requested but the Elasticsearch output is not configured/enabled
-
-Attempting to start Filebeat without setting up the template produces the following message:
-
-    Warning: Couldn't read data from file "/etc/filebeat/filebeat.template.json",
-    Warning: this makes an empty POST.
-    {
-      "error" : {
-        "root_cause" : [
-          {
-            "type" : "parse_exception",
-            "reason" : "request body is required"
-          }
-        ],
-        "type" : "parse_exception",
-        "reason" : "request body is required"
-      },
-      "status" : 400
-    }
-
-One can assume that in later releases of Filebeat the instructions will be clarified to specify how to manually load the index template into an specific instance of Elasticsearch, and that the warning message will vanish as no longer applicable in version 6.   
+A `docker-compose.yml` file that provides a quick and easy ELK deployment with Kibana proxied through traefik with basic authentication can be found at https://github.com/spujadas/elk-docker/issues/374.
 
 ## Troubleshooting <a name="troubleshooting"></a>
 
@@ -784,15 +763,15 @@ Here are a few pointers to help you troubleshoot your containerised ELK.
 ### If Elasticsearch isn't starting... <a name="es-not-starting"></a>
 
 If the suggestions listed in [Frequently encountered issues](#frequent-issues) don't help, then an additional way of working out why Elasticsearch isn't starting is to:
- 
+
 - Start a container with the `bash` command:
 	
 		$ sudo docker run -it docker_elk bash
 
 - Start Elasticsearch manually to look at what it outputs:
-	 
+	
 		$ ES_PATH_CONF=/etc/elasticsearch gosu elasticsearch /opt/elasticsearch/bin/elasticsearch \
-			-Epath.logs=/var/log/elasticsearch
+			-Epath.logs=/var/log/elasticsearch \
 			-Epath.data=/var/lib/elasticsearch
 
 ### If your log-emitting client doesn't seem to be able to reach Logstash... <a name="logstash-unreachable"></a>
@@ -810,7 +789,7 @@ Make sure that:
 - Your client is configured to connect to Logstash using TLS (or SSL) and that it trusts Logstash's self-signed certificate (or certificate authority if you replaced the default certificate with a proper certificate – see [Security considerations](#security-considerations)).
 
   	To check if Logstash is authenticating using the right certificate, check for errors in the output of
-
+		
 		$ openssl s_client -connect localhost:5044 -CAfile logstash-beats.crt
 
 	where `logstash-beats.crt` is the name of the file containing Logstash's self-signed certificate.
@@ -922,10 +901,24 @@ Here is the list of breaking changes that may have side effects when upgrading t
 	Users of images with tags `es231_l231_k450` and `es232_l232_k450` are strongly recommended to override Logstash's options to disable the auto-reload feature by setting the `LS_OPTS` environment variable to `--no-auto-reload` if this feature is not needed.
 
 	To enable auto-reload in later versions of the image:
- 
+
 	- From `es500_l500_k500` onwards: add the `--config.reload.automatic` command-line option to `LS_OPTS`.
 
 	- From `es234_l234_k452` to `es241_l240_k461`: add `--auto-reload` to `LS_OPTS`. 
+
+## Release notes <a name="release-notes"></a>
+
+The following information may be helpful when upgrading to later versions of the ELK image:
+
+- **Version 8.0**
+
+  Elasticsearch security is on by default since version 8.0 of the Elastic stack.
+
+  In the opinion of the Docker image’s author, setting up the Elastic stack with security enabled is somewhat fiddly. Security has therefore been disabled in this image to get everything up and running as smoothly as possible out of the box.
+  
+  See the [Security considerations](#security-considerations) section for information on setting up security.
+  
+  
 
 ## References <a name="references"></a>
 
