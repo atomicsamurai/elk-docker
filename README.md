@@ -84,11 +84,6 @@ idm-config
 idm-core
 idm-everything
 idm-sync
-userstore
-userstore-access
-userstore-config-audit
-userstore-ldif-importer
-userstore-upgrade
 ```
 Beware that for every item in the comma separated list, filebeat will make a separate request (using a separate httpjson input). With a large list, one can easily overwhelm the GCP API quotas.
 
